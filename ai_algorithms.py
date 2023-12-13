@@ -12,14 +12,6 @@ import numpy as np
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 StochasticGameState = namedtuple('StochasticGameState', 'to_move, utility, board, moves, chance')
 
-class Game:
-    pass
-
-from game_management import *
-class TicTacToe(Game):
-  pass
-
-
 
 def minmax_decision(state, game):
     return None
@@ -61,5 +53,37 @@ def generate_all_moves_tree(current_state, game, max_depth=3):
 # tree = generate_all_moves_tree(current_state, TicTacToe())
 # print(tree)
 
+def minmax_decision(state, game):
+    """Given a state in a game, calculate the best move by searching
+    forward all the way to the terminal states. [Figure 5.3]"""
+
+    def max_value(state):
+        if game.terminal_test(state):
+            return game.utility(state, player)
+        v = -np.inf
+        for a in actions(state):
+            v = max(v, min_value(game.result(state, a)))
+        return v
+
+    def min_value(state):
+        if game.terminal_test(state):
+            return game.utility(state, player)
+        v = np.inf
+        for a in game.actions(state):
+            v = min(v, max_value(game.result(state, a)))
+        return v
+
+    # Body of minmax_decision:
+    return max(game.actions(state), key=lambda a: min_value(game.result(state, a)))
 
 
+    #if check_gamestatus(cells) !=4: 
+        #return check_gamestatus(cells)
+        
+        
+    def actions(self, state):
+        """Return a list of the allowable moves at this point."""
+        if self.terminal_test(state):
+            return []
+        else:
+            return self.moves
