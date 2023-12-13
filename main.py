@@ -32,8 +32,8 @@ def main():
             if event.type == pygame.QUIT:
                 exit()
 
-            #and my_turn
-            elif event.type == pygame.MOUSEBUTTONDOWN and not game_over :
+            #
+            elif event.type == pygame.MOUSEBUTTONDOWN and not game_over and my_turn:
                 # mark the appropriate tile
                 # get the position of the mouse
 
