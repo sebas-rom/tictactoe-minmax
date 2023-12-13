@@ -9,7 +9,7 @@ import copy
 
 from game_management import Game_mngmt
 import sys
-from ai_algorithms import TicTacToe, minmax_decision
+from ai_algorithms import minmax_decision,actions
 import time
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 def main():
@@ -32,8 +32,8 @@ def main():
             if event.type == pygame.QUIT:
                 exit()
 
-
-            elif event.type == pygame.MOUSEBUTTONDOWN and not game_over and my_turn:
+            #and my_turn
+            elif event.type == pygame.MOUSEBUTTONDOWN and not game_over :
                 # mark the appropriate tile
                 # get the position of the mouse
 
@@ -50,7 +50,7 @@ def main():
                         break
 
                 game_mngmt.mark(cell_row, cell_col, window, game_mngmt.board.board_squares)
-
+                actions(game_mngmt.board.board_squares)
                 my_turn = not my_turn  # Toggle turn
                 pygame.display.flip()
                 pygame.display.update()
@@ -62,22 +62,22 @@ def main():
                     time.sleep(4)
                     sys.exit()
             
-            #AI turn
-            elif not game_over and not my_turn:
-                # x,y = minmax_decision(game_mngmt.board.board_squares)
-                game_mngmt.mark(2, 2, window, game_mngmt.board.board_squares)
+            # #AI turn
+            # elif not game_over and not my_turn:
+            #     # x,y = minmax_decision(game_mngmt.board.board_squares)
+            #     game_mngmt.mark(2, 2, window, game_mngmt.board.board_squares)
 
-                my_turn = not my_turn  # Toggle turn
+            #     my_turn = not my_turn  # Toggle turn
 
-                pygame.display.flip()
-                pygame.display.update()
-                status = game_mngmt.check_gamestatus(game_mngmt.board.board_squares)
-                if status == TERMINAL_STATE.MAX_WON or \
-                        status == TERMINAL_STATE.MIN_WON or \
-                        status == TERMINAL_STATE.TIE_GAME:
-                    pygame.display.update()
-                    time.sleep(4)
-                    sys.exit()
+            #     pygame.display.flip()
+            #     pygame.display.update()
+            #     status = game_mngmt.check_gamestatus(game_mngmt.board.board_squares)
+            #     if status == TERMINAL_STATE.MAX_WON or \
+            #             status == TERMINAL_STATE.MIN_WON or \
+            #             status == TERMINAL_STATE.TIE_GAME:
+            #         pygame.display.update()
+            #         time.sleep(4)
+            #         sys.exit()
 
 
 
