@@ -63,21 +63,22 @@ def main():
                     sys.exit()
             
             # #AI turn
-            # elif not game_over and not my_turn:
-            #     # x,y = minmax_decision(game_mngmt.board.board_squares)
-            #     game_mngmt.mark(2, 2, window, game_mngmt.board.board_squares)
+            elif not game_over and not my_turn:
+                move= minmax_decision(game_mngmt.board.board_squares)
+                x,y=move
+                game_mngmt.mark(x, y, window, game_mngmt.board.board_squares)
 
-            #     my_turn = not my_turn  # Toggle turn
+                my_turn = not my_turn  # Toggle turn
 
-            #     pygame.display.flip()
-            #     pygame.display.update()
-            #     status = game_mngmt.check_gamestatus(game_mngmt.board.board_squares)
-            #     if status == TERMINAL_STATE.MAX_WON or \
-            #             status == TERMINAL_STATE.MIN_WON or \
-            #             status == TERMINAL_STATE.TIE_GAME:
-            #         pygame.display.update()
-            #         time.sleep(4)
-            #         sys.exit()
+                pygame.display.flip()
+                pygame.display.update()
+                status = game_mngmt.check_gamestatus(game_mngmt.board.board_squares)
+                if status == TERMINAL_STATE.MAX_WON or \
+                        status == TERMINAL_STATE.MIN_WON or \
+                        status == TERMINAL_STATE.TIE_GAME:
+                    pygame.display.update()
+                    time.sleep(4)
+                    sys.exit()
 
 
 

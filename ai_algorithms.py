@@ -4,28 +4,29 @@ import copy
 import itertools
 import random
 from collections import namedtuple
-import game_management
-from confs import *
+
 import numpy as np
+from game_management import Game_mngmt
+from board import Board
+from confs import window,TERMINAL_STATE, B_ROWS, B_COLS, PLAYER_ONE, PLAYER_TWO
+from board_square import Board_Square
 
-
-
-GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 def minmax_decision(state):
     """
     Returns the best move for the AI player using the minimax algorithm.
     """
-    _, move = max_value(state)
+    _, move = min_value(state)
     return move
-
 
 def max_value(state):
     """
     Maximize the utility value for the AI player.
     """
+    # print("max_value loop")
     if terminal_test(state):
+        # print("is terminal, value:",utility(state))
         return utility(state), None
-
+    
     max_utility = -9999999
     best_move = None
 
@@ -34,90 +35,147 @@ def max_value(state):
         min_val, _ = min_value(next_state)
 
         if min_val > max_utility:
+            # print("max choosing action: ",action," value:",min_val)
             max_utility = min_val
             best_move = action
 
     return max_utility, best_move
 
-
 def min_value(state):
     """
     Minimize the utility value for the opponent player.
     """
+    # print("____min_value loop")
     if terminal_test(state):
+        # print("is terminal, value:",utility(state))
         return utility(state), None
 
     min_utility = 9999999
     best_move = None
 
     for action in actions(state):
+        # print("action: ",action)
         next_state = result(state, action)
         max_val, _ = max_value(next_state)
 
         if max_val < min_utility:
+            print("min choosing action: ",action," value:",max_val)
             min_utility = max_val
             best_move = action
 
     return min_utility, best_move
 
-
 def terminal_test(state):
     """
     Check if the current state is a terminal state.
     """
-    # Implement your logic to determine if the game is in a terminal state
-    # This will depend on the structure of your GameState and TERMINAL_STATE enums.
-    # You can compare the state to TERMINAL_STATE values to check if the game has ended.
-    return state is not None and state in [TERMINAL_STATE.MAX_WON, TERMINAL_STATE.MIN_WON, TERMINAL_STATE.TIE_GAME]
-
+     # Create a shallow copy of the window
+    status = Game_mngmt.check_gamestatus(state)
+    isTerminal = False
+    if status.value != 4:
+        isTerminal = True
+    return isTerminal
 
 def utility(state):
     """
     Assign utility values to terminal states.
     """
-    # Implement your logic to assign utility values based on the outcome of the game.
-    # You can use the TERMINAL_STATE enum to determine the outcome.
-    if state == TERMINAL_STATE.MAX_WON:
-        return MAX_WON_UTIL
-    elif state == TERMINAL_STATE.MIN_WON:
-        return MIN_WON_UTIL
-    elif state == TERMINAL_STATE.TIE_GAME:
-        return TIE_UTIL
-    else:
-        # Non-terminal state; return a default value
+    
+    status = Game_mngmt.check_gamestatus(state)
+    if(status==TERMINAL_STATE.TIE_GAME):
         return 0
-
+    elif(status==TERMINAL_STATE.MAX_WON):
+        return 1
+    elif(status==TERMINAL_STATE.MIN_WON):
+        return -1
 
 def actions(state):
     """
     Generate possible actions for the current state.
     """
-    # based on a state, return a list of possible actions
-    # each action is a tuple of (row, col)
-    actions = []
-    for row in state:
-        i=state.index(row)
-        for col in row:
-            j=row.index(col)
-            if col.symbol == 0:
-                actions.append((i,j))
-    
-    print (actions)
-    return actions
-    
+    possible_actions = []
 
+    # Iterate through each row and column of the board
+    for row in range(B_ROWS):
+        for col in range(B_COLS):
+            # Check if the square is empty (0 indicates an empty square)
+            if state[row][col].symbol == 0:
+                # If the square is empty, add it to the list of possible actions
+                possible_actions.append((row, col))
+    return possible_actions
+    
 def result(state, action):
     """
     Apply the action to the current state and return the new state.
     """
-    # Implement your logic to apply the action to the current state and return the new state.
-    # This will depend on the structure of your GameState.
-    state = copy.deepcopy(state)
-    state[action[0]][action[1]].symbol = 2
-    
-    
-    return state  # Placeholder; replace with actual implementation
+    state_copy = copy.deepcopy(state)
+    # Set the current player to the player who will play next
+    current_player = who_plays_next(state_copy)
+    # Mark the action on the copied state
+    state_copy[action[0]][action[1]].symbol = current_player
+    # print("result:  from action: ",action)
+    # print_board(state_copy)
+    return state_copy
 
-        
-        
+def who_plays_next(cells):
+    player_one_count = 0
+    player_two_count = 0
+    for row in cells:
+        for cell in row:
+            if cell.symbol == 1:
+                player_one_count += 1
+            elif cell.symbol == 2:
+                player_two_count += 1
+    if player_one_count > player_two_count:
+        return 2
+    else:
+        return 1
+
+def print_board(cells, print_XO=True):
+    for row in cells:
+        for cell in row:
+            if print_XO:
+                if cell.symbol == 0:
+                    print('-', end=" ")
+                elif cell.symbol == 1:
+                    print('X', end=" ")
+                elif cell.symbol == 2:
+                    print('O', end=" ")
+            else:
+                print(cell.symbol, end=" ")
+        print()
+
+
+def test_minmax_decision():
+    # board_squares_data = [
+    #     [2, 2, 1],
+    #     [1, 0, 2],
+    #     [0, 0, 1]
+    # ]
+    # board_squares_data = [
+    #     [1, 2, 2],
+    #     [0, 1, 0],
+    #     [0, 1, 2]
+    # ]
+    board_squares_data = [
+        [0, 0, 0],
+        [0, 1, 0],
+        [0, 0, 0]
+    ]
+    
+    initial_state = [
+        [Board_Square(row, col, value) for col, value in enumerate(row_data)] 
+        for row, row_data in enumerate(board_squares_data)
+    ]
+    # print("Initial State:")
+    # print_board(initial_state)
+    # print("Starting...")
+
+    ai_move = minmax_decision(initial_state)
+
+    print("\nAI Move:")
+    print(ai_move)
+
+if __name__ == "__main__":
+    test_minmax_decision()       
    

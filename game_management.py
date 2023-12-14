@@ -128,7 +128,7 @@ class Game_mngmt:
             window.blit(img_nought, (x, y))
             self.current_player = PLAYER_ONE
         
-        self.print_board(cells)
+        #self.print_board(cells)
     
     def print_board(self, cells):
         for row in cells:
