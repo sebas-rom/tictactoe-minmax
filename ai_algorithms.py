@@ -59,7 +59,7 @@ def min_value(state):
         max_val, _ = max_value(next_state)
 
         if max_val < min_utility:
-            print("min choosing action: ",action," value:",max_val)
+            #print("min choosing action: ",action," value:",max_val)
             min_utility = max_val
             best_move = action
 
