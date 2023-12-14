@@ -70,7 +70,7 @@ def terminal_test(state):
     Check if the current state is a terminal state.
     """
      # Create a shallow copy of the window
-    status = Game_mngmt.check_gamestatus(state)
+    status = check_gamestatus(state)
     isTerminal = False
     if status.value != 4:
         isTerminal = True
@@ -81,7 +81,7 @@ def utility(state):
     Assign utility values to terminal states.
     """
     
-    status = Game_mngmt.check_gamestatus(state)
+    status = check_gamestatus(state)
     if(status==TERMINAL_STATE.TIE_GAME):
         return 0
     elif(status==TERMINAL_STATE.MAX_WON):
@@ -112,7 +112,7 @@ def result(state, action):
     # Set the current player to the player who will play next
     current_player = who_plays_next(state_copy)
     # Mark the action on the copied state
-    state_copy[action[0]][action[1]].symbol = current_player
+    mark(action[0], action[1], state_copy, current_player)
     # print("result:  from action: ",action)
     # print_board(state_copy)
     return state_copy
@@ -127,10 +127,9 @@ def who_plays_next(cells):
             elif cell.symbol == 2:
                 player_two_count += 1
     if player_one_count > player_two_count:
-        return 2
+        return PLAYER_TWO
     else:
-        return 1
-
+        return PLAYER_ONE
 def print_board(cells, print_XO=True):
     for row in cells:
         for cell in row:
@@ -175,6 +174,76 @@ def test_minmax_decision():
 
     print("\nAI Move:")
     print(ai_move)
+def check_gamestatus(cells):
+        diag_count_pl1 = 0
+        diag_count_pl2 = 0
+        board_filled_count = 0
+        for row in range(B_ROWS):
+            cols_count_pl1 = 0
+            cols_count_pl2 = 0
+
+            if row == 1:
+                if cells[row][row].symbol == 1  and  cells[row+1][row+1].symbol == 1 and \
+                        cells[row-1][row-1].symbol == 1:
+                    diag_count_pl1 = 3
+                if cells[row][row].symbol == 2 and cells[row + 1][row + 1].symbol == 2 and \
+                        cells[row - 1][row - 1].symbol == 2:
+                    diag_count_pl2 = 3
+
+                if cells[row][row].symbol == 1 and cells[row - 1][row + 1].symbol == 1 and \
+                        cells[row + 1][row - 1].symbol == 1:
+                    diag_count_pl1 = 3
+                if cells[row][row].symbol == 2 and cells[row - 1][row + 1].symbol == 2 and \
+                        cells[row + 1][row - 1].symbol == 2:
+                    diag_count_pl2 = 3
+
+            if diag_count_pl1 == B_ROWS:
+                return TERMINAL_STATE.MAX_WON
+
+            if diag_count_pl2 == B_ROWS:
+                return TERMINAL_STATE.MIN_WON
+
+            for col in range(B_COLS):
+                if cells[row][col].symbol == 1:
+                    cols_count_pl1 += 1
+                    board_filled_count += 1
+                elif cells[row][col].symbol == 2:
+                    cols_count_pl2 += 1
+                    board_filled_count += 1
+
+                if cols_count_pl1 == B_COLS:
+                    return TERMINAL_STATE.MAX_WON
+
+                if cols_count_pl2 == B_COLS:
+                    return TERMINAL_STATE.MIN_WON
+
+                if row == 0:
+                    rows_count_pl1 = 0
+                    rows_count_pl2 = 0
+                    for row_test in range(B_ROWS):
+                        if cells[row_test][col].symbol == 1:
+                            rows_count_pl1 += 1
+                        elif cells[row_test][col].symbol == 2:
+                            rows_count_pl2 += 1
+
+                        if rows_count_pl1 == B_ROWS:
+                            return TERMINAL_STATE.MAX_WON
+
+                        if rows_count_pl2 == B_ROWS:
+                            return TERMINAL_STATE.MIN_WON
+
+        if board_filled_count == B_ROWS * B_ROWS:
+            return TERMINAL_STATE.TIE_GAME
+        else:
+            return TERMINAL_STATE.NOT_TERMINAL
+
+def mark(row, col, cells, current_player):
+        if current_player == PLAYER_ONE and cells[row][col].symbol == 0:
+            cells[row][col].symbol = 1
+            current_player = PLAYER_TWO
+        elif cells[row][col].symbol == 0:
+            cells[row][col].symbol = 2
+            current_player = PLAYER_ONE
 
 if __name__ == "__main__":
     test_minmax_decision()       
