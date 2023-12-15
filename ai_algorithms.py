@@ -11,11 +11,14 @@ from board import Board
 from confs import window,TERMINAL_STATE, B_ROWS, B_COLS, PLAYER_ONE, PLAYER_TWO
 from board_square import Board_Square
 
-def minmax_decision(state):
+def minmax_decision(state,is_player_two_min):
     """
     Returns the best move for the AI player using the minimax algorithm.
     """
-    _, move = min_value(state)
+    if is_player_two_min:
+        _, move = min_value(state)
+    else:
+        _, move = max_value(state)
     return move
 
 def max_value(state):
@@ -289,8 +292,11 @@ def min_value_pruning(state, alpha, beta):
 
     return min_utility, best_move
 
-def minmax_decision_pruning(state):
-    _, move = min_value_pruning(state, -9999999, 9999999)
+def minmax_decision_pruning(state,is_player_two_min):
+    if is_player_two_min:
+        _, move = min_value_pruning(state, -9999999, 9999999)
+    else:
+        _, move = max_value_pruning(state, -9999999, 9999999)
     return move
 
 if __name__ == "__main__":
