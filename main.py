@@ -1,5 +1,7 @@
 import sys
 import time
+import random
+
 from collections import namedtuple
 
 import pygame
@@ -103,7 +105,6 @@ def main():
     pygame.draw.rect(window, (255, 255, 255), play_alpha_beta_button)
     pygame.display.flip()
 
-    # Continue with the rest of the game logic
     board = Board(window)
     board.build_board()
     game_mngmt = Game_mngmt(board)
@@ -112,15 +113,33 @@ def main():
     cell_row = None
     pygame.display.flip()
     pygame.display.update()
-    print("is_minmax: ",is_minmax)
-    print("is_player_two_min: ",is_player_two_min)
+    print("is_minmax: ", is_minmax)
+    print("is_player_two_min: ", is_player_two_min)
     ai_thinking = False  # Add a flag to track whether AI is thinking
 
+    # If the AI is starting, make a random move
+    if not my_turn:
+        ai_thinking = True
+        pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
+
+        # Choose a random move
+        random_col = random.randint(0, B_COLS - 1)
+        random_row = random.randint(0, B_ROWS - 1)
+
+        # Make the move
+        game_mngmt.mark(random_row, random_col, window, game_mngmt.board.board_squares)
+
+        pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
+        ai_thinking = False
+        my_turn = not my_turn  # Toggle turn
+
+    check_terminal(game_mngmt)
+
+    # The game loop
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-
             # Player's turn
             elif event.type == pygame.MOUSEBUTTONDOWN and not game_over and my_turn and not ai_thinking:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
