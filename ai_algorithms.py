@@ -170,7 +170,7 @@ def test_minmax_decision():
     # print_board(initial_state)
     # print("Starting...")
 
-    ai_move = minmax_decision(initial_state)
+    ai_move = minmax_decision_pruning(initial_state)
 
     print("\nAI Move:")
     print(ai_move)
@@ -244,6 +244,54 @@ def mark(row, col, cells, current_player):
         elif cells[row][col].symbol == 0:
             cells[row][col].symbol = 2
             current_player = PLAYER_ONE
+
+def max_value_pruning(state, alpha, beta):
+    if terminal_test(state):
+        return utility(state), None
+
+    max_utility = -9999999
+    best_move = None
+
+    for action in actions(state):
+        next_state = result(state, action)
+        min_val, _ = min_value_pruning(next_state, alpha, beta)
+
+        if min_val > max_utility:
+            max_utility = min_val
+            best_move = action
+
+        if max_utility >= beta:
+            return max_utility, best_move
+
+        alpha = max(alpha, max_utility)
+
+    return max_utility, best_move
+
+def min_value_pruning(state, alpha, beta):
+    if terminal_test(state):
+        return utility(state), None
+
+    min_utility = 9999999
+    best_move = None
+
+    for action in actions(state):
+        next_state = result(state, action)
+        max_val, _ = max_value_pruning(next_state, alpha, beta)
+
+        if max_val < min_utility:
+            min_utility = max_val
+            best_move = action
+
+        if min_utility <= alpha:
+            return min_utility, best_move
+
+        beta = min(beta, min_utility)
+
+    return min_utility, best_move
+
+def minmax_decision_pruning(state):
+    _, move = min_value_pruning(state, -9999999, 9999999)
+    return move
 
 if __name__ == "__main__":
     test_minmax_decision()       
