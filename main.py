@@ -9,7 +9,7 @@ import copy
 
 from game_management import Game_mngmt
 import sys
-from ai_algorithms import minmax_decision,actions
+from ai_algorithms import minmax_decision,actions,minmax_decision_pruning
 import time
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 def main():
@@ -64,7 +64,7 @@ def main():
             
             # #AI turn
             elif not game_over and not my_turn:
-                move= minmax_decision(game_mngmt.board.board_squares)
+                move= minmax_decision_pruning(game_mngmt.board.board_squares)
                 x,y=move
                 game_mngmt.mark(x, y, window, game_mngmt.board.board_squares)
 
