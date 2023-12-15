@@ -114,15 +114,15 @@ def main():
     pygame.display.update()
     print("is_minmax: ",is_minmax)
     print("is_player_two_min: ",is_player_two_min)
+    ai_thinking = False  # Add a flag to track whether AI is thinking
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
 
             # Player's turn
-            elif event.type == pygame.MOUSEBUTTONDOWN and not game_over and my_turn:
-                # mark the appropriate tile
-                # get the position of the mouse
+            elif event.type == pygame.MOUSEBUTTONDOWN and not game_over and my_turn and not ai_thinking:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
 
                 for col in range(B_COLS):
@@ -139,9 +139,9 @@ def main():
                 actions(game_mngmt.board.board_squares)
                 my_turn = not my_turn  # Toggle turn
                 check_terminal(game_mngmt)
-            
-            # #AI's turn
-            elif not game_over and not my_turn:
+
+            # AI's turn
+            elif not game_over and not my_turn and not ai_thinking:
                 # Add the "AI thinking" text on top of the game
                 font = pygame.font.Font(None, 36)
                 ai_thinking_text = font.render("AI thinking", True, (255, 0, 0))
@@ -150,23 +150,29 @@ def main():
                 pygame.display.flip()
                 pygame.display.update()
 
-                # Block mouse events during AI's move
+                # Block player's mouse events during AI's move
                 pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
+                ai_thinking = True
 
                 # Choose algorithm
                 if is_minmax:
-                    x, y = minmax_decision(game_mngmt.board.board_squares,is_player_two_min)
+                    x, y = minmax_decision(game_mngmt.board.board_squares, is_player_two_min)
                 else:
-                    x, y = minmax_decision_pruning(game_mngmt.board.board_squares,is_player_two_min)
-                # move
+                    x, y = minmax_decision_pruning(game_mngmt.board.board_squares, is_player_two_min)
+
+                # Move
                 game_mngmt.mark(x, y, window, game_mngmt.board.board_squares)
 
-                pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)  # Allow mouse events after AI's move
-
+                # Allow player's mouse events after AI's move
+                pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
+                ai_thinking = False
                 my_turn = not my_turn  # Toggle turn
 
                 # Remove the "AI thinking" text after AI's move
                 window.fill((255, 255, 255), (BOARD_X_OFFSET, BOARD_Y_OFFSET - 40, 200, 40))
+
+                # Clear the event queue to prevent processing old events
+                pygame.event.clear()
 
                 check_terminal(game_mngmt)
 
