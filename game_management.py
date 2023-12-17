@@ -127,7 +127,14 @@ class Game_mngmt:
             cells[row][col].symbol = 2
             window.blit(img_nought, (x, y))
             self.current_player = PLAYER_ONE
-
+        
+        #self.print_board(cells)
+    
+    def print_board(self, cells):
+        for row in cells:
+            for cell in row:
+                print(cell.symbol, end=" ")
+            print()
     def set_with_algorithm(self, move, copy_of_board):
         col,row = move
         player = self.current_player
